@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>OwO 簡繁互轉｜小幫手</title>
+  <style>
+    :root { --bg:#f4f7fb; --panel:#fff; --text:#172033; --muted:#687386; --line:#dce3ee; --brand:#4f46e5; --brand2:#7c3aed; --ok:#087a55; --shadow:0 18px 48px rgba(31,41,55,.10); }
+    @media (prefers-color-scheme: dark) { :root { --bg:#0f1420; --panel:#171e2d; --text:#edf2ff; --muted:#9ba8bd; --line:#303b4e; --brand:#8b83ff; --brand2:#b779ff; --ok:#4adca8; --shadow:0 18px 52px rgba(0,0,0,.28); } }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif; color:var(--text); background:radial-gradient(circle at 10% 0%,rgba(79,70,229,.14),transparent 30%),var(--bg); }
+    .app { width:min(1320px,96vw); margin:auto; padding:28px 0 34px; }
+    header { display:flex; gap:18px; justify-content:space-between; align-items:end; margin-bottom:20px; }
+    h1 { margin:0; font-size:clamp(25px,4vw,38px); letter-spacing:.02em; }
+    header p { margin:7px 0 0; color:var(--muted); }
+    .badge { flex:none; padding:8px 12px; border:1px solid var(--line); border-radius:999px; color:var(--ok); background:var(--panel); font-size:13px; }
+    .toolbar,.settings,.editor { background:var(--panel); border:1px solid var(--line); box-shadow:var(--shadow); }
+    .toolbar { padding:13px; border-radius:18px; display:flex; flex-wrap:wrap; gap:9px; align-items:center; }
+    button,.file-btn,select,input { font:inherit; }
+    button,.file-btn { border:1px solid var(--line); color:var(--text); background:var(--panel); border-radius:11px; padding:10px 14px; cursor:pointer; transition:.16s; }
+    button:hover,.file-btn:hover { transform:translateY(-1px); border-color:var(--brand); }
+    button.primary { color:#fff; border:0; background:linear-gradient(135deg,var(--brand),var(--brand2)); font-weight:700; }
+    .spacer { flex:1; }
+    .file-btn input { display:none; }
+    .settings { margin-top:14px; padding:12px 14px; border-radius:16px; display:flex; flex-wrap:wrap; gap:18px; align-items:center; }
+    label.inline { display:flex; gap:8px; align-items:center; color:var(--muted); }
+    select { color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:7px 10px; }
+    .switch { position:relative; width:42px; height:24px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; inset:0; background:#aeb7c6; border-radius:24px; cursor:pointer; }
+    .slider:before { content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:white; border-radius:50%; transition:.2s; }
+    .switch input:checked+.slider { background:var(--brand); }
+    .switch input:checked+.slider:before { transform:translateX(18px); }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    .editor { border-radius:18px; overflow:hidden; min-width:0; }
+    .editor-head { padding:13px 15px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    .editor-head strong { font-size:17px; }
+    .count { color:var(--muted); font-size:13px; white-space:nowrap; }
+    textarea { width:100%; min-height:450px; padding:18px; border:0; outline:0; resize:vertical; color:var(--text); background:var(--panel); font:17px/1.75 "Microsoft JhengHei","Noto Sans TC",sans-serif; }
+    textarea::placeholder { color:var(--muted); }
+    .status { min-height:24px; padding:12px 4px 0; color:var(--muted); font-size:14px; }
+    footer { margin-top:18px; color:var(--muted); font-size:13px; text-align:center; }
+    dialog { width:min(760px,92vw); color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:0; box-shadow:var(--shadow); }
+    dialog::backdrop { background:rgba(0,0,0,.45); }
+    dialog header { padding:18px 20px 10px; margin:0; align-items:center; }
+    dialog .body { padding:0 20px 18px; }
+    dialog textarea { min-height:230px; border:1px solid var(--line); border-radius:12px; }
+    .dialog-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+    @media(max-width:820px) { .app{padding-top:18px}.grid{grid-template-columns:1fr}textarea{min-height:310px}header{align-items:start}.badge{display:none}.toolbar button,.file-btn{flex:1 1 auto}.spacer{display:none} }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1>OwO 簡繁互轉｜小幫手</h1><p>內建常用繁簡字形、台灣詞彙及可自行保存的自訂詞彙規則。</p></div>
+    
+  </header>
+
+  <section class="toolbar" aria-label="主要工具列">
+    <button id="convert" class="primary">立即轉換</button>
+    <button id="swap">交換內容</button>
+    <button id="paste">貼上</button>
+    <button id="copy">複製結果</button>
+    <button id="clear">全部清空</button>
+    <span class="spacer"></span>
+    <label class="file-btn">匯入 TXT<input id="file" type="file" accept=".txt,text/plain"></label>
+    <button id="download">匯出 TXT</button>
+    <button id="customBtn">自訂詞彙</button>
+  </section>
+
+  <section class="settings">
+    <label class="inline">轉換方向
+      <select id="direction">
+        <option value="s2t">簡體 → 繁體（台灣用語）</option>
+        <option value="t2s">繁體 → 簡體</option>
+        <option value="auto">自動判斷</option>
+      </select>
+    </label>
+    <label class="inline">即時轉換 <span class="switch"><input id="live" type="checkbox" checked><span class="slider"></span></span></label>
+    <label class="inline">保留空白與換行 <span class="switch"><input id="spacing" type="checkbox" checked><span class="slider"></span></span></label>
+  </section>
+
+  <main class="grid">
+    <section class="editor"><div class="editor-head"><strong>原始文字</strong><span id="sourceCount" class="count">0 字｜0 行</span></div><textarea id="source" autofocus placeholder="請貼上或輸入要轉換的文字……"></textarea></section>
+    <section class="editor"><div class="editor-head"><strong>轉換結果</strong><span id="resultCount" class="count">0 字｜0 行</span></div><textarea id="result" placeholder="轉換結果會顯示在這裡……"></textarea></section>
+  </main>
+  <div id="status" class="status" role="status">準備完成。</div>
+  
+</div>
+
+<dialog id="customDialog">
+  <header><div><strong>自訂詞彙</strong><p>每行格式：簡體=繁體，例如：服务器=伺服器</p></div></header>
+  <div class="body">
+    <textarea id="customText" placeholder="服务器=伺服器&#10;软件=軟體"></textarea>
+    <div class="dialog-actions"><button id="resetCustom">重設</button><button id="closeCustom">取消</button><button id="saveCustom" class="primary">儲存</button></div>
+  </div>
+</dialog>
+
+<script>
+'use strict';
+// 先套用詞彙，再套用單字。規則均在本機執行。
+const phrasePairs = [
+['打印机','印表機'],['打印','列印'],['激光打印机','雷射印表機'],['软件','軟體'],['硬件','硬體'],['程序','程式'],['服务器','伺服器'],['数据库','資料庫'],['网络','網路'],['互联网','網際網路'],['鼠标','滑鼠'],['光标','游標'],['视频','影片'],['音频','音訊'],['图像','影像'],['屏幕','螢幕'],['显示器','顯示器'],['内存','記憶體'],['硬盘','硬碟'],['文件夹','資料夾'],['文件','檔案'],['默认','預設'],['设置','設定'],['保存','儲存'],['加载','載入'],['上传','上傳'],['下载','下載'],['运行','執行'],['创建','建立'],['删除','刪除'],['回收站','資源回收筒'],['快捷方式','捷徑'],['登录','登入'],['退出登录','登出'],['账号','帳號'],['用户','使用者'],['信息','資訊'],['消息','訊息'],['数据','資料'],['代码','程式碼'],['源代码','原始碼'],['剪贴板','剪貼簿'],['粘贴','貼上'],['复制','複製'],['查找','尋找'],['替换','取代'],['文本','文字'],['字体','字型'],['链接','連結'],['组件','元件'],['插件','外掛程式'],['扩展程序','擴充功能'],['缓存','快取'],['芯片','晶片'],['智能','智慧'],['人工智能','人工智慧'],['优化','最佳化'],['兼容','相容'],['反馈','意見回饋'],['支持','支援'],['项目','專案'],['质量','品質'],['水平','水準'],['渠道','管道'],['博客','部落格'],['邮件','郵件'],['邮箱','信箱'],['短信','簡訊'],['摄像头','攝影機'],['麦克风','麥克風'],['终端','終端機'],['命令行','命令列'],['崩溃','當機'],['点击','點選'],['回车键','Enter 鍵'],['应用程序','應用程式'],['操作系统','作業系統'],['二进制','二進位'],['十六进制','十六進位'],['字节','位元組'],['位图','點陣圖'],['矢量图','向量圖'],['分辨率','解析度'],['全屏','全螢幕'],['窗口','視窗'],['菜单','選單'],['工具栏','工具列'],['选项卡','索引標籤'],['复选框','核取方塊'],['单选按钮','選項按鈕'],['滚动条','捲軸'],['触摸屏','觸控螢幕'],['移动设备','行動裝置'],['便携式','可攜式'],['笔记本电脑','筆記型電腦'],['台式机','桌上型電腦'],['U盘','隨身碟'],['闪存','快閃記憶體'],['驱动程序','驅動程式'],['防火墙','防火牆'],['验证码','驗證碼'],['二维码','QR Code'],['出租车','計程車'],['公交车','公車'],['地铁','捷運'],['自行车','腳踏車'],['摩托车','機車'],['快递','宅配'],['外卖','外送'],['方便面','泡麵'],['土豆','馬鈴薯'],['西红柿','番茄'],['菠萝','鳳梨'],['酸奶','優格'],['奶酪','起司'],['冰激凌','冰淇淋'],['创可贴','OK 繃'],['一次性','拋棄式'],['质量','品質'],['水平','水準'],['出租汽车','計程車'],['硅谷','矽谷']
+];
+const sChars = '万与丑专业丛东丝丢两严丧个丰临为丽举么义乌乐乔习乡书买乱争于亏云亘亚产亩亲亵亿仅仆从仑仓仪们价众优会伛伞伟传伤伦伪体余佣侠侣侥侦侧侨侩侪侬俣俦俨俩俪俭债倾偬偻偾偿傥傧储儿兑党兰关兴养兽冈册写军农冯冲决况冻净凄准凉减凑凛几凤凭凯击凿刍划刘则刚创删别刬刭刹刽刿剀剂剐剑剥剧劝办务动励劲劳势勋匀匦匮区医华协单卖卢卤卧卫却卺厂厅历厉压厌厕厢厦厨厩厮县参叆叇双发变叙叠叶号叹叽吓吕吗吨听启吴呐呒呓呕呖呗员呙呛呜咏咙咛咝咤响哑哒哓哔哕哗哙哜哝哟唇唛唠唡唢唤啧啬啭啮啰啴啸喷喽喾嗫嗳嘘嘤嘱噜嚣团园围囵国图圆圣场坏块坚坛坜坝坞坟坠垄垅垆垒垦垩垫垭垲垴埘埙埚埝域埯堑堕塆墙壮声壳壶壸处备复够头夸夹夺奋奖奥妆妇妈妩妪妫姗姜娄娅娆娇娈娱娲娴婳婵婶媪媭嫒嫔嫱嬷孙学孪宁宝实宠审宪宫宽宾寝对寻导寿将尔尘尧尝尴尸尽层屃屉届属屡屿岁岂岖岗岘岙岚岛岭岳岽岿峃峄峡峣峤峥峦崂崃崄崭嵘嵛嵝巅巩巯币帅师帏帐帘帜带帧帮帱帻帼幂并广庄庆庐库应庙庞废庑库庞开异弃张弥弯弹强归当录彟彦彻径忆忏忧忾怀态怂怃怄怅怆怜总怼怿恋恳恶恸恹恺恻恼恽悦悫悬悭悯惊惧惨惩惫惬惭惮惯愠愤愦愿慑懒懔戆戋戏戗战戬户扑执扩扪扫扬扰抚抛抟抠抡抢护报担拟拢拣拥拦拧拨择挂挚挛挜挝挞挟挠挡挢挣挤挥挦挽捞损捡换捣据掳掴掷掸掺掼揽搀搁搂搅携摄摆摇摈摊撄撑撵撷撸撺擞攒敌敛数斋斓斗斩断无旧时旷昙昼显晋晒晓晔晕晖暂暧术朴机杀杂权条来杨杰极构枞枢枣枥枧枨枪枫枭柜柠柽栀栅标栈栉栋栌栎栏树栖样栾桠桡桢档桥桦桧桨桩梦梼梾梿检棂椁椟椠椤椭楼榄榇榈榉槚槛槟横樯樱橥橱橹橼檩欢欤欧歼殁殇残殒殓殚殡殴毁毂毕毙毡毵氇气氢氩氲汇汉汤汹沟没沣沤沥沦沧沪沩泞泪泷泸泺泻泼泽泾洁洒洼浃浅浆浇浈浊测济浏浑浒浓浔浕涂涌涛涝涞涟涠涡涣涤润涧涨涩淀渊渌渍渎渐渑渔渖温湾湿溃溅滚滞滟满滢滤滥滦滨滩潆潇潋潍潜潴澜濑濒灏灭灯灵灾灿炀炉炖点炼炽烁烂烛烟烦烧烨烩烫烬热焕焖焘爱爷牍牦牵犊状犷犸犹狈狝狞独狭狮狯狱狲猃猎猕猡猪猫猬献獭玑玙珏珐珑珰珲琏琐琼瑶璎瓒瓮甙电画畅畴疖疗疟疠疡疬疭疮疯疱疴痈痉痒痖痨痪痫瘅瘆瘗瘘瘪瘫瘾瘿癞癣癫皑皱皲盏盐监盖盗盘眍眦睁睐睑瞩矫矶矿砀码砖砗砚砜砺砻砾础硁硕硖硗硙确硷碍碛碜碱碹磙礼祎祢祯祷祸禀禄禅离秃秆种积称秽秾稆税稳穑穷窃窍窎窑窜窝窥窦竖竞笃笋笔笕笺笼笾筑筚筛筝筹签简箓箦箧箨箩箪箫篑篓篮篱簖籁籴类粜粝粤粪粮糁紧絷纠纡红纣纤纥约级纨纩纪纫纬纭纯纰纱纲纳纵纶纷纸纹纺纽纾线绀绁绂练组绅细织终绉绊绋绌绍绎经绐绑绒结绔绕绖绗绘给绚绛络绝绞统绠绡绢绣绥绦继绨绩绪绫续绮绯绰绱绲绳维绵绶绷绸绺综绽绾绿缀缁缂缃缄缅缆缇缈缉缊缋缌缎缏缑缒缓缔缕编缗缘缙缚缛缜缝缟缠缡缢缣缤缥缦缧缨缩缪缫缬缭缮缯缰缱缲缳缴缵罂网罗罚罢罴羁羟翘耢耧耸耻聂聋职联聪肃肠肤肮肴肾肿胀胁胆胜胡胧胪胫胶脉脍脏脐脑脓脸腊腻腼腽腾膑臜舆舰舱艰艳艺节芜苁苇苈苋苌苍苎苏苹范茎茏茑茔茕茧荆荐荙荚荛荜荞荟荠荡荣荤荥荦荧荨荩荪荫药莅莱莲莳莴莶获莸莹莺萝萤营萦萧萨葱蒇蒉蒋蒌蓝蓟蓠蓣蓥蓦蔷蔹蔺蔼蕲蕴薮藓蘖虏虑虚虫虬虮虽虾虿蚀蚁蚂蚕蚝蚬蛊蛎蛏蛮蛰蛱蛲蛳蜕蜗蝇蝉蝼衅衔补表衬衮袄袅袜袭袯装裆裢裣裤褛褴见观规觅视觇览觉觊觋觌觎觏觐觑觞触詟誉訚计订讣认讥讦讧讨让讪讫训议讯记讱讲讳讴讵讶讷许讹论讻讼讽设访诀证诂诃评诅识诇诈诉诊诋诌词诎诏译诒诓诔试诖诗诘诙诚诛诜话诞诟诠诡询诣诤该详诧诨诩诫诬语诮误诰诱诲诳说诵请诸诹诺读诼诽课诿谀谁谂调谄谅谆谇谈谊谋谌谍谎谏谐谑谒谓谔谕谖谗谘谙谚谛谜谝谟谠谡谢谣谤谥谦谧谨谩谪谬谭谯谰谱谲谳谴谵谶谷豮贝贞负贡财责贤败账货质贩贪贫贬购贮贯贰贱贲贳贴贵贶贷贸费贺贻贼贽贾贿赀赁赂赃资赅赆赇赈赉赊赋赌赍赎赏赐赔赓贤赣赪赵赶趋趱跃跄跞践跷跸跹跻踊踌踪踬踯蹑蹒蹰蹿躏躜躯车轧轨轩轪轫转轭轮软轰轱轲轳轴轵轶轷轸轹轺轻轼载轾轿辀辁辂较辄辅辆辇辈辉辊辋辍辎辏辐辑输辔辕辖辗辘辙辚辞辩辫边辽达迁过迈运还这进远违连迟迩迳迹适选逊递逦逻遗遥邓邝邬邮邹邺邻郏郐郑郓郦郧酝酱酽释里鉴钅钆钇针钉钊钋钌钍钎钏钐钑钒钓钔钕钗钙钚钛钜钝钞钟钠钡钢钣钤钥钦钧钨钩钪钫钬钭钮钯钰钱钲钳钴钵钶钷钸钹钺钻钼钽钾铀铁铂铃铄铅铆铇铈铉铊铋铌铍铎铐铑铒铕铖铗铙铛铜铝铠铡铢铣铤铥铧铨铩铪铫铬铭铮铯铰铱铲铳铴银铷铸铺铼链铿销锁锄锅锈锉锋锌锍锎锏锐锑锒锓锔锕锖锗锘错锚锛锝锞锟锡锢锣锤锥锦锨锩锪锬锭键锯锰锱锲锴锵锶锷锸锹锺锻锼锽锾镀镁镂镃镄镅镆镇镈镉镊镋镌镍镎镏镐镑镒镓镔镕镖镗镘镙镚镛镜镝镞镟镠镡镢镣镤镥镦镧镨镩镪镫镬镭镯镰镱镲镳长门闩闪闫闭问闯闰闱闲闳间闵闶闷闸闹闺闻闼闽闾阀阁阂阃阄阅阆阈阉阊阋阌阍阎阏阐阑阒阔阕阖阗阘阙阚阛队阳阴阵阶际陆陇陈陉陕陧陨险随隐隶难雏雠雳雾霁霭靓静靥鞑鞒鞯韦韧韩韪韫韬页顶顷项顺须顼顽顾顿颀颁颂预颅领颇颈颉颊颋颌颍颎颏颐频颓颔颖颗题颚颛颜额颞颟颠颡颢颤颥颦风飏飐飑飒飓飔飕飖飘飙飞飨餍饣饤饥饦饧饨饩饪饫饬饭饮饯饰饱饲饳饴饵饶饷饺饼饽饿馀馁馂馃馄馅馆馈馊馋馌馍馏馐馑馒馓馔馕马驭驮驯驰驱驳驴驵驶驷驸驹驺驻驼驽驾驿骀骁骂骅骆骇骈骊骋验骍骎骏骐骑骒骓骖骗骘骚骛骜骝骞骟骠骡骢骣骤骥骦骧骨髅髋髌鬓魇魉鱼鱿鲁鲂鲅鲆鲇鲈鲋鲍鲎鲐鲑鲒鲔鲕鲚鲛鲜鲞鲟鲠鲡鲢鲣鲥鲦鲧鲨鲩鲫鲭鲮鲰鲱鲲鲳鲴鲵鲷鲸鲺鲻鲼鲽鳃鳄鳅鳆鳇鳌鳍鳎鳏鳐鳓鳔鳕鳖鳗鳙鳜鳞鳟鳢鸟鸠鸡鸢鸣鸥鸦鸨鸩鸪鸫鸬鸭鸯鸱鸲鸳鸵鸶鸷鸸鸹鸺鸻鸽鸾鸿鹁鹂鹃鹄鹅鹆鹇鹈鹉鹊鹋鹌鹎鹏鹑鹕鹗鹚鹛鹜鹞鹣鹤鹦鹧鹨鹩鹪鹫鹬鹭鹰鹱鹳鹾麦麸麽黄黉黩黪黾鼋鼍齐齑齿龀龃龄龅龆龇龈龉龊龋龌龙龚龛龟';
+const tChars = '萬與醜專業叢東絲丟兩嚴喪個豐臨為麗舉麼義烏樂喬習鄉書買亂爭於虧雲亙亞產畝親褻億僅僕從崙倉儀們價眾優會傴傘偉傳傷倫偽體餘傭俠侶僥偵側僑儈儕儂俁儔儼倆儷儉債傾傯僂僨償儻儐儲兒兌黨蘭關興養獸岡冊寫軍農馮沖決況凍淨淒準涼減湊凜幾鳳憑凱擊鑿芻劃劉則剛創刪別剗剄剎劊劌剴劑剮劍剝劇勸辦務動勵勁勞勢勳勻匭匱區醫華協單賣盧鹵臥衛卻巹廠廳歷厲壓厭廁廂廈廚廄廝縣參靉靆雙發變敘疊葉號嘆嘰嚇呂嗎噸聽啟吳吶嘸囈嘔嚦唄員咼嗆嗚詠嚨嚀噝吒響啞噠嘵嗶噦嘩噲嚌噥喲脣嘜嘮啢嗩喚嘖嗇囀嚙囉嘽嘯噴嘍嚳囁噯噓嚶囑嚕囂團園圍圇國圖圓聖場壞塊堅壇壢壩塢墳墜壟壠壚壘墾堊墊埡塏堖塒塤堝墊域垵塹墮壪牆壯聲殼壺壼處備復夠頭誇夾奪奮獎奧妝婦媽嫵嫗媯姍薑婁婭嬈嬌孌娛媧嫻嫿嬋嬸媼嬃嬡嬪嬙嬤孫學孿寧寶實寵審憲宮寬賓寢對尋導壽將爾塵堯嘗尷屍盡層屓屜屆屬屢嶼歲豈嶇崗峴嶴嵐島嶺嶽崠巋嶨嶧峽嶢嶠崢巒嶗崍嶮嶄嶸崳嶁巔鞏巰幣帥師幃帳簾幟帶幀幫幬幘幗冪並廣莊慶廬庫應廟龐廢廡廩龐開異棄張彌彎彈強歸當錄彠彥徹徑憶懺憂愾懷態慫憮慪悵愴憐總懟懌戀懇惡慟懨愷惻惱惲悅愨懸慳憫驚懼慘懲憊愜慚憚慣慍憤憒願懾懶懍戇戔戲戧戰戩戶撲執擴捫掃揚擾撫拋摶摳掄搶護報擔擬攏揀擁攔擰撥擇掛摯攣掗撾撻挾撓擋撟掙擠揮捵挽撈損撿換搗據擄摑擲撣摻摜攬攙擱摟攪攜攝擺搖擯攤攖撐攆擷擼攛擻攢敵斂數齋斕鬥斬斷無舊時曠曇晝顯晉曬曉曄暈暉暫曖術樸機殺雜權條來楊傑極構樅樞棗櫪梘棖槍楓梟櫃檸檉梔柵標棧櫛棟櫨櫟欄樹棲樣欒椏橈楨檔橋樺檜槳樁夢檮棶槤檢櫺槨櫝槧欏橢樓欖櫬櫚櫸檟檻檳橫檣櫻櫫櫥櫓櫞檁歡歟歐殲歿殤殘殞殮殫殯毆毀轂畢斃氈毿氌氣氫氬氳匯漢湯洶溝沒灃漚瀝淪滄滬溈濘淚瀧瀘濼瀉潑澤涇潔灑窪浹淺漿澆湞濁測濟瀏渾滸濃潯濜塗湧濤澇淶漣潿渦渙滌潤澗漲澀澱淵淥漬瀆漸澠漁瀋溫灣濕潰濺滾滯灩滿瀅濾濫灤濱灘瀠瀟瀲濰潛瀦瀾瀨瀕灝滅燈靈災燦煬爐燉點煉熾爍爛燭煙煩燒燁燴燙燼熱煥燜燾愛爺牘氂牽犢狀獷獁猶狽獮獰獨狹獅獪獄猻獫獵獼玀豬貓蝟獻獺璣璵玨琺瓏璫琿璉瑣瓊瑤瓔瓚甕甙電畫暢疇癤療瘧癘瘍癧瘲瘡瘋皰痾癰痙癢瘂癆瘓癇癉瘮瘞瘺癟癱癮癭癩癬癲皚皺皸盞鹽監蓋盜盤瞘眥睜睞瞼矚矯磯礦碭碼磚硨硯碸礪礱礫礎硜碩硤磽磑確鹼礙磧磣鹼碹磙禮禕禰禎禱禍稟祿禪離禿稈種積稱穢穠穭稅穩穡窮竊竅窵窯竄窩窺竇豎競篤筍筆筧箋籠籩築篳篩箏籌簽簡籙簀篋籜籮簞簫簣簍籃籬籪籟糴類糶糲粵糞糧糝緊縶糾紆紅紂纖紇約級紈纊紀紉緯紜純紕紗綱納縱綸紛紙紋紡紐紓線紺紲紱練組紳細織終縐絆紼絀紹繹經紿綁絨結絝繞紖絎繪給絢絳絡絕絞統綆綃絹繡綏絛繼綈績緒綾續綺緋綽緔緄繩維綿綬繃綢綹綜綻綰綠綴緇緙緗緘緬纜緹緲緝縕繢緦緞緶緱縋緩締縷編緡緣縉縛縟縝縫縞纏縭縊縑繽縹縵縲纓縮繆繅纈繚繕繒繮繾繰繯繳纘罌網羅罰罷羆羈羥翹耮耬聳恥聶聾職聯聰肅腸膚骯餚腎腫脹脅膽勝鬍朧臚脛膠脈膾髒臍腦膿臉臘膩靦膃騰臏臢輿艦艙艱豔藝節蕪蓯葦藶莧萇蒼苧蘇蘋範莖蘢蔦塋煢繭荊薦薘莢蕘蓽蕎薈薺盪榮葷滎犖熒蕁藎蓀蔭藥蒞萊蓮蒔萵薟獲蕕瑩鶯蘿螢營縈蕭薩蔥蕆蕢蔣蔞藍薊蘺蕷鎣驀薔蘞藺藹蘄蘊藪蘚櫱虜慮虛蟲虯蟣雖蝦蠆蝕蟻螞蠶蠔蜆蠱蠣蟶蠻蟄蛺蟯螄蛻蝸蠅蟬螻釁銜補錶襯袞襖裊襪襲襏裝襠褳襝褲褸襤見觀規覓視覘覽覺覬覡覿覦覯覲覷觴觸讋譽誾計訂訃認譏訐訌討讓訕訖訓議訊記訒講諱謳詎訝訥許訛論訩訟諷設訪訣證詁訶評詛識詗詐訴診詆謅詞詘詔譯詒誆誄試詿詩詰詼誠誅詵話誕詬詮詭詢詣諍該詳詫諢詡誡誣語誚誤誥誘誨誑說誦請諸諏諾讀諑誹課諉諛誰諗調諂諒諄諛談誼謀諶諜謊諫諧謔謁謂諤諭諼讒諮諳諺諦謎諞謨讜謖謝謠謗諡謙謐謹謾謫謬譚譙讕譜譎讞譴譫讖穀豶貝貞負貢財責賢敗賬貨質販貪貧貶購貯貫貳賤賁貰貼貴貺貸貿費賀貽賊贄賈賄貲賃賂贓資賅贐賕賑賚賒賦賭齎贖賞賜賠賡賢贛赬趙趕趨趲躍蹌躒踐蹺蹕躚躋踴躊蹤躓躑躡蹣躕躥躪躦軀車軋軌軒軑軔轉軛輪軟轟軲軻轤軸軹軼軤軫轢軺輕軾載輊轎輈輇輅較輒輔輛輦輩輝輥輞輟輜輳輻輯輸轡轅轄輾轆轍轔辭辯辮邊遼達遷過邁運還這進遠違連遲邇逕跡適選遜遞邐邏遺遙鄧鄺鄔郵鄒鄴鄰郟鄶鄭鄆酈鄖醞醬釅釋裡鑒釒釓釔針釘釗釙釕釷釺釧釤鈒釩釣鍆釹釵鈣鈈鈦鉅鈍鈔鐘鈉鋇鋼鈑鈐鑰欽鈞鎢鉤鈧鈁鈥鈄鈕鈀鈺錢鉦鉗鈷缽鈳鉕鈽鉑鉞鑽鉬鉭鉀鈾鐵鉑鈴鑠鉛鉚鉋鈰鉉鉈鉍鈮鈹鐸銬銠鉺銪鋮鋏鐃鐺銅鋁鎧鍘銖銑鋌銩鏵銓鎩鉿銚鉻銘錚銫鉸銥鏟銃鐋銀銣鑄鋪錸鏈鏗銷鎖鋤鍋鏽銼鋒鋅鋶鐦鐧銳銻鋃鋟鋦錒錆鍺鍩錯錨錛鍀錁錕錫錮鑼錘錐錦鍁錈鍃錟錠鍵鋸錳錙鍥鍇鏘鍶鍔鍤鍬鍾鍛鎪鍠鐶鍍鎂鏤鎡鑥鎇鏌鎮鎛鎘鑷鎲鐫鎳鎿鎦鎬鎊鎰鎵鑌鎔鏢鏜鏝鏍鏰鏞鏡鏑鏃旋鏐鐔钁鐐鏷鑥鐓鑭鐠鑹鏹鐙鑊鐳鐲鐮鐿鑔鑣長門閂閃閆閉問闖閏闈閒閎間閔閌悶閘鬧閨聞闥閩閭閥閣閡閫鬮閱閬閾閹閶鬩閿閽閻閼闡闌闃闊闋闔闐闒闕闞闤隊陽陰陣階際陸隴陳陘陝隉隕險隨隱隸難雛讎靂霧霽靄靚靜靨韃鞽韉韋韌韓韙韞韜頁頂頃項順須頊頑顧頓頎頒頌預顱領頗頸頡頰頲頜潁熲頦頤頻頹頷穎顆題顎顓顏額顳顢顛顙顥顫顬顰風颺颭颮颯颶颸颼颻飄飆飛饗饜飠飣飢飥餳飩餼飪飫飭飯飲餞飾飽飼餖飴餌饒餉餃餅餑餓餘餒餕餜餛餡館饋餿饞饁饃餾饈饉饅饊饌饢馬馭馱馴馳驅駁驢駔駛駟駙駒騶駐駝駑駕驛駘驍罵驊駱駭駢驪騁驗騂駸駿騏騎騍騅驂騙騭騷騖驁騮騫騸驃騾驄驏驟驥驦驤骨髏髖髕鬢魘魎魚魷魯魴鮁鮃鮎鱸鮒鮑鱟鮐鮭鮚鮪鮞鱭鮫鮮鯗鱘鯁鱺鰱鰹鰣鰷鯀鯊鯇鯽鯖鯪鯫鯡鯤鯧鯝鯢鯛鯨鯴鯔鱝鰈鰓鱷鰍鰒鰉鰲鰭鰨鰥鰩鰳鰾鱈鱉鰻鱅鱖鱗鱒鱧鳥鳩雞鳶鳴鷗鴉鴇鴆鴣鶇鸕鴨鴦鴟鴝鴛鴕鷥鷙鴯鴰鵂鴴鴿鸞鴻鵓鸝鵑鵠鵝鵒鷳鵜鵡鵲鶓鵪鵯鵬鶉鶘鶚鷀鶥鶩鷂鶼鶴鸚鷓鶺鷯鷦鷲鷸鷺鷹鸌鸛鹺麥麩麼黃黌黷黲黽黿鼉齊齏齒齔齟齡齙齠齜齦齬齪齲齷龍龔龕龜';
+
+const s2tChar = new Map(); const t2sChar = new Map();
+for (let i=0;i<Math.min(sChars.length,tChars.length);i++) { s2tChar.set(sChars[i],tChars[i]); if(!t2sChar.has(tChars[i])) t2sChar.set(tChars[i],sChars[i]); }
+const $ = id => document.getElementById(id);
+const source=$('source'), result=$('result'), direction=$('direction'), status=$('status');
+let timer;
+
+function customPairs(){
+  const raw=localStorage.getItem('owo_custom_pairs')||'';
+  return raw.split(/\r?\n/).map(x=>x.split('=')).filter(x=>x.length>=2&&x[0]).map(([s,...r])=>[s,r.join('=')]);
+}
+function allPairs(){ return [...customPairs(),...phrasePairs].sort((a,b)=>b[0].length-a[0].length); }
+function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function replacePairs(text,pairs,reverse=false){
+  for(const pair of pairs){ const from=reverse?pair[1]:pair[0], to=reverse?pair[0]:pair[1]; if(from&&from!==to) text=text.replace(new RegExp(escapeRegExp(from),'g'),to); }
+  return text;
+}
+function detect(text){ let s=0,t=0; for(const ch of text){ if(s2tChar.has(ch))s++; if(t2sChar.has(ch))t++; } return s>=t?'s2t':'t2s'; }
+function transform(text,dir){
+  const reverse=dir==='t2s';
+  let out=replacePairs(text,allPairs(),reverse);
+  const map=reverse?t2sChar:s2tChar;
+  out=Array.from(out,ch=>map.get(ch)||ch).join('');
+  if(!$('spacing').checked) out=out.replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  return out;
+}
+function counts(text){ return `${Array.from(text).length} 字｜${text?text.split(/\n/).length:0} 行`; }
+function updateCounts(){ $('sourceCount').textContent=counts(source.value); $('resultCount').textContent=counts(result.value); }
+function convert(show=true){
+  let dir=direction.value; if(dir==='auto') dir=detect(source.value);
+  result.value=transform(source.value,dir); updateCounts();
+  if(show) status.textContent=`已完成${dir==='s2t'?'簡體轉繁體':'繁體轉簡體'}，共處理 ${Array.from(source.value).length} 個字元。`;
+}
+function live(){ updateCounts(); if(!$('live').checked)return; clearTimeout(timer); timer=setTimeout(()=>convert(false),120); }
+source.addEventListener('input',live); result.addEventListener('input',updateCounts); direction.addEventListener('change',()=>convert()); $('spacing').addEventListener('change',()=>convert());
+$('convert').onclick=()=>convert();
+$('swap').onclick=()=>{ [source.value,result.value]=[result.value,source.value]; direction.value=direction.value==='s2t'?'t2s':direction.value==='t2s'?'s2t':'auto'; convert(); status.textContent='已交換左右內容。'; };
+$('clear').onclick=()=>{ source.value='';result.value='';updateCounts();source.focus();status.textContent='已清空內容。'; };
+$('paste').onclick=async()=>{ try{ source.value=await navigator.clipboard.readText();live();status.textContent='已從剪貼簿貼上。'; }catch{ source.focus(); status.textContent='瀏覽器未允許直接讀取剪貼簿，請按 Ctrl+V 貼上。'; } };
+$('copy').onclick=async()=>{ if(!result.value){status.textContent='目前沒有可複製的結果。';return;} try{await navigator.clipboard.writeText(result.value);status.textContent='已複製轉換結果。';}catch{result.select();document.execCommand('copy');status.textContent='已複製轉換結果。';} };
+$('file').onchange=async e=>{ const f=e.target.files[0];if(!f)return; source.value=await f.text();live();status.textContent=`已匯入 ${f.name}。`;e.target.value=''; };
+$('download').onclick=()=>{ const text=result.value||source.value;if(!text){status.textContent='目前沒有可匯出的文字。';return;} const blob=new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='轉換結果.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status.textContent='已匯出 TXT。'; };
+const dialog=$('customDialog'), customText=$('customText');
+$('customBtn').onclick=()=>{customText.value=localStorage.getItem('owo_custom_pairs')||'';dialog.showModal();};
+$('closeCustom').onclick=()=>dialog.close();
+$('saveCustom').onclick=()=>{localStorage.setItem('owo_custom_pairs',customText.value.trim());dialog.close();convert();status.textContent='自訂詞彙已儲存在此瀏覽器。';};
+$('resetCustom').onclick=()=>{customText.value='';localStorage.removeItem('owo_custom_pairs');};
+dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
+updateCounts();
+</script>
+</body>
+</html>
